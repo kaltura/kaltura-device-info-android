@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Kaltura Device Info</string>
+    <string name="action_settings">Settings</string>
+    <string name="send_to">Send To</string>
+</resources>
