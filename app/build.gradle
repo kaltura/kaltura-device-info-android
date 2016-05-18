@@ -15,11 +15,6 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            
-            // Install apks directly from jitpack -- need to sign the release.
-            if (System.getenv("JITPACK")=="true") {
-                signingConfig signingConfigs.debug
-            }
         }
     }
 }
