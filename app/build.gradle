@@ -18,7 +18,7 @@ android {
         }
     }
 
-    defaultPublishConfig "release"
+    defaultPublishConfig "debug"
 }
 
 dependencies {
