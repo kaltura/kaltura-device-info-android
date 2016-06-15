@@ -19,6 +19,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.UUID;
@@ -42,6 +43,7 @@ class Collector {
             root.put("drm", drmInfo());
             root.put("display", displayInfo());
             root.put("media", mediaCodecInfo());
+            root.put("root", rootInfo());
         } catch (JSONException e) {
             Log.e(TAG, "Error");
         }
@@ -71,9 +73,16 @@ class Collector {
         try {
             if (drmManagerClient.canHandle("", "video/wvm")) {
                 DrmInfoRequest request = new DrmInfoRequest(DrmInfoRequest.TYPE_REGISTRATION_INFO, "video/wvm");
-                request.put("WVPortalKey", "kaltura");
+                request.put("WVPortalKey", "OEM");
                 DrmInfo response = drmManagerClient.acquireDrmInfo(request);
-                json.put("widevine", response.get("WVDrmInfoRequestVersionKey"));
+                String status = (String) response.get("WVDrmInfoRequestStatusKey");
+                
+                status = new String[]{"HD_SD", null, "SD"}[Integer.parseInt(status)];
+                json.put("widevine", 
+                        new JSONObject()
+                                .put("version", response.get("WVDrmInfoRequestVersionKey"))
+                                .put("status", status)
+                );
             }
         } catch (Exception e) {
             json.put("error", e.getMessage() + '\n' + Log.getStackTraceString(e));
@@ -160,6 +169,27 @@ class Collector {
             return null;
         }
         
+        final JSONArray mediaDrmEvents = new JSONArray();
+        
+        mediaDrm.setOnEventListener(new MediaDrm.OnEventListener() {
+            @Override
+            public void onEvent(MediaDrm md, byte[] sessionId, int event, int extra, byte[] data) {
+                try {
+                    mediaDrmEvents.put(new JSONObject().put("event", event).put("extra", extra).put("data", Base64.encodeToString(data, Base64.NO_WRAP)));
+                } catch (JSONException e) {
+                    Log.e(TAG, "JSONError", e);
+                }
+            }
+        });
+
+        try {
+            byte[] session;
+            session = mediaDrm.openSession();
+            mediaDrm.closeSession(session);
+        } catch (Exception e) {
+            mediaDrmEvents.put(new JSONObject().put("exception", e.toString()));
+        }
+
         String[] stringProps = {MediaDrm.PROPERTY_VENDOR, MediaDrm.PROPERTY_VERSION, MediaDrm.PROPERTY_DESCRIPTION, MediaDrm.PROPERTY_ALGORITHMS, "securityLevel", "systemId", "privacyMode", "sessionSharing", "usageReportingSupport", "appId", "origin", "hdcpLevel", "maxHdcpLevel", "maxNumberOfSessions", "numberOfOpenSessions"};
         String[] byteArrayProps = {MediaDrm.PROPERTY_DEVICE_UNIQUE_ID, "provisioningUniqueId", "serviceCertificate"};
         
@@ -184,7 +214,13 @@ class Collector {
             props.put(prop, value);
         }
         
-        return props;
+        JSONObject response = new JSONObject();
+        response.put("properties", props);
+        response.put("events", mediaDrmEvents);
+
+
+
+        return response;
     }
     
     private JSONObject buildInfo() throws JSONException {
@@ -194,6 +230,25 @@ class Collector {
                 .put("BRAND", Build.BRAND)
                 .put("MODEL", Build.MODEL)
                 .put("MANUFACTURER", Build.MANUFACTURER)
+                .put("TAGS", Build.TAGS)
                 .put("FINGERPRINT", Build.FINGERPRINT);
     }
+    
+    private JSONObject rootInfo() throws JSONException {
+
+        JSONObject info = new JSONObject();
+
+        String[] paths = { "/system/app/Superuser.apk", "/sbin/su", "/system/bin/su", "/system/xbin/su", "/data/local/xbin/su", "/data/local/bin/su", "/system/sd/xbin/su",
+                "/system/bin/failsafe/su", "/data/local/su" };
+        JSONArray files = new JSONArray();
+        for (String path : paths) {
+            if (new File(path).exists()) {
+                files.put(path);
+            }
+        }
+        info.put("existingFiles", files);
+
+        return info;
+    }
 }
+
