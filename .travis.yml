@@ -19,7 +19,7 @@ after_success:
 - mv app/build/outputs/apk/app-debug.apk kaltura-device-info-debug.apk
 deploy:
   provider: releases
-  draft: true
+  draft: false
   skip_cleanup: true
   file:
     - kaltura-device-info-debug.apk
