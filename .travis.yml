@@ -1,0 +1,34 @@
+sudo: false
+language: android
+android:
+  components:
+  - tools
+  - platform-tools
+  - build-tools-23.0.3
+  - android-23
+  - extra-android-m2repository
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+before_cache:
+  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+script:
+  - ./gradlew assembleDebug
+after_success:
+- mv app/build/outputs/apk/app-debug.apk kaltura-device-info-debug.apk
+deploy:
+  provider: releases
+  draft: true
+  skip_cleanup: true
+  file:
+    - kaltura-device-info-debug.apk
+  on:
+    tags: true
+  api-key: $GH_TOKEN
+notifications:
+  email:
+    recipients:
+      - noam.tamim@kaltura.com
+    on_success: always
+    on_failure: always
