@@ -15,7 +15,7 @@ android {
         
         release {
             if (System.getenv("KEYSTORE_KEY_ALIAS")) {
-                storeFile rootProject.file('release.keystore')
+                storeFile rootProject.file('release.jks')
                 storePassword System.getenv("KEYSTORE_PASS")
                 keyAlias System.getenv("KEYSTORE_KEY_ALIAS")
                 keyPassword System.getenv("KEYSTORE_KEY_PASS")
