@@ -39,6 +39,7 @@ class Collector {
     JSONObject collect() {
         JSONObject root = new JSONObject();
         try {
+            root.put("meta", meta());
             root.put("build", buildInfo());
             root.put("drm", drmInfo());
             root.put("display", displayInfo());
@@ -48,6 +49,12 @@ class Collector {
             Log.e(TAG, "Error");
         }
         return root;
+    }
+
+    private JSONObject meta() throws JSONException {
+        return new JSONObject()
+                .put("versionName", BuildConfig.VERSION_NAME)
+                .put("versionCode", BuildConfig.VERSION_CODE);
     }
 
     private JSONObject displayInfo() throws JSONException {
@@ -173,7 +180,7 @@ class Collector {
         
         mediaDrm.setOnEventListener(new MediaDrm.OnEventListener() {
             @Override
-            public void onEvent(MediaDrm md, byte[] sessionId, int event, int extra, byte[] data) {
+            public void onEvent(@NonNull MediaDrm md, byte[] sessionId, int event, int extra, byte[] data) {
                 try {
                     mediaDrmEvents.put(new JSONObject().put("event", event).put("extra", extra).put("data", Base64.encodeToString(data, Base64.NO_WRAP)));
                 } catch (JSONException e) {
