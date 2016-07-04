@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
                 sendIntent.setAction(Intent.ACTION_SEND);
                 sendIntent.putExtra(Intent.EXTRA_TEXT, sendData);
                 sendIntent.putExtra(Intent.EXTRA_SUBJECT, "Kaltura Device Info - " + Build.BRAND + "/" + Build.MODEL + "/" + Build.VERSION.RELEASE + "/" + Build.VERSION.SDK_INT);
-                sendIntent.setType("application/json");
+//                sendIntent.setType("application/json");
                 startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.send_to)));
             }
         });
