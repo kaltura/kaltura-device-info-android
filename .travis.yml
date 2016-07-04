@@ -13,15 +13,16 @@ cache:
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 script:
-  - ./gradlew assembleDebug
+  - ./gradlew build
 after_success:
-- mv app/build/outputs/apk/app-debug.apk kaltura-device-info-debug.apk
+  - ls -l app/build/outputs/apk
+  - mv app/build/outputs/apk/app-release.apk kaltura-device-info-release.apk
 deploy:
   provider: releases
   draft: false
   skip_cleanup: true
   file:
-    - kaltura-device-info-debug.apk
+    - kaltura-device-info-release.apk
   on:
     tags: true
   api-key: $GH_TOKEN
