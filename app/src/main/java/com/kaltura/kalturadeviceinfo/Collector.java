@@ -196,7 +196,21 @@ class Collector {
             session = mediaDrm.openSession();
             mediaDrm.closeSession(session);
         } catch (Exception e) {
-            mediaDrmEvents.put(new JSONObject().put("exception", e.toString()));
+            mediaDrmEvents.put(new JSONObject().put("Exception(openSession)", e.toString()));
+        }
+
+
+        JSONObject provision = new JSONObject();
+        try {
+            MediaDrm.ProvisionRequest provisionRequest = mediaDrm.getProvisionRequest();
+            byte[] data = provisionRequest.getData();
+            String encodedData = Base64.encodeToString(data, Base64.NO_WRAP);
+
+            provision
+                    .put("url", provisionRequest.getDefaultUrl())
+                    .put("data", encodedData);
+        } catch (Exception e) {
+            provision.put("exception", e.toString());
         }
 
         String[] stringProps = {MediaDrm.PROPERTY_VENDOR, MediaDrm.PROPERTY_VERSION, MediaDrm.PROPERTY_DESCRIPTION, MediaDrm.PROPERTY_ALGORITHMS, "securityLevel", "systemId", "privacyMode", "sessionSharing", "usageReportingSupport", "appId", "origin", "hdcpLevel", "maxHdcpLevel", "maxNumberOfSessions", "numberOfOpenSessions"};
@@ -222,11 +236,11 @@ class Collector {
             }
             props.put(prop, value);
         }
-        
+
         JSONObject response = new JSONObject();
         response.put("properties", props);
         response.put("events", mediaDrmEvents);
-
+        response.put("provisionRequest", provision);
 
 
         return response;
