@@ -209,8 +209,12 @@ class Collector {
             provision
                     .put("url", provisionRequest.getDefaultUrl())
                     .put("data", encodedData);
-        } catch (Exception e) {
-            provision.put("exception", e.toString());
+        } catch (RuntimeException e) {
+            String message = e.toString();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && e instanceof MediaDrm.MediaDrmStateException) {
+                message += "; " + ((MediaDrm.MediaDrmStateException) e).getDiagnosticInfo();
+            }
+            provision.put("Exception(getProvisionRequest)", message);
         }
 
         String[] stringProps = {MediaDrm.PROPERTY_VENDOR, MediaDrm.PROPERTY_VERSION, MediaDrm.PROPERTY_DESCRIPTION, MediaDrm.PROPERTY_ALGORITHMS, "securityLevel", "systemId", "privacyMode", "sessionSharing", "usageReportingSupport", "appId", "origin", "hdcpLevel", "maxHdcpLevel", "maxNumberOfSessions", "numberOfOpenSessions"};
