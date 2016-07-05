@@ -182,7 +182,9 @@ class Collector {
             @Override
             public void onEvent(@NonNull MediaDrm md, byte[] sessionId, int event, int extra, byte[] data) {
                 try {
-                    mediaDrmEvents.put(new JSONObject().put("event", event).put("extra", extra).put("data", Base64.encodeToString(data, Base64.NO_WRAP)));
+                    String encodedData = data == null ? null : Base64.encodeToString(data, Base64.NO_WRAP);
+                    
+                    mediaDrmEvents.put(new JSONObject().put("event", event).put("extra", extra).put("data", encodedData));
                 } catch (JSONException e) {
                     Log.e(TAG, "JSONError", e);
                 }
@@ -215,7 +217,7 @@ class Collector {
             String value;
             try {
                 value = Base64.encodeToString(mediaDrm.getPropertyByteArray(prop), Base64.NO_WRAP);
-            } catch (IllegalStateException e) {
+            } catch (IllegalStateException|NullPointerException e) {
                 value = "<unknown>";
             }
             props.put(prop, value);
