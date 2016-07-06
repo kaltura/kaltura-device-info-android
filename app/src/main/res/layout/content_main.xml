@@ -11,12 +11,8 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.kaltura.kalturadeviceinfo.MainActivity"
-    tools:showIn="@layout/activity_main">
-
-    <!--WebView
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:id="@+id/webView"/-->
+    tools:showIn="@layout/activity_main"
+    tools:ignore="HardcodedText">
 
     <ScrollView
         android:layout_width="fill_parent"
@@ -26,8 +22,9 @@
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="New Text"
+            android:text="Collecting info..."
             android:id="@+id/textView"
-            android:textIsSelectable="true"/>
+            android:textIsSelectable="true"
+            />
     </ScrollView>
 </RelativeLayout>
