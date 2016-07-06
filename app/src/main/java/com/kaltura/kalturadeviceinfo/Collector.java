@@ -251,6 +251,12 @@ class Collector {
     }
     
     private JSONObject buildInfo() throws JSONException {
+        JSONObject arch = new JSONObject().put("os.arch", System.getProperty("os.arch"));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            arch.put("SUPPORTED_ABIS", new JSONArray(Build.SUPPORTED_ABIS));
+            arch.put("SUPPORTED_32_BIT_ABIS", new JSONArray(Build.SUPPORTED_32_BIT_ABIS));
+            arch.put("SUPPORTED_64_BIT_ABIS", new JSONArray(Build.SUPPORTED_64_BIT_ABIS));
+        }
         return new JSONObject()
                 .put("RELEASE", Build.VERSION.RELEASE)
                 .put("SDK_INT", Build.VERSION.SDK_INT)
@@ -258,7 +264,8 @@ class Collector {
                 .put("MODEL", Build.MODEL)
                 .put("MANUFACTURER", Build.MANUFACTURER)
                 .put("TAGS", Build.TAGS)
-                .put("FINGERPRINT", Build.FINGERPRINT);
+                .put("FINGERPRINT", Build.FINGERPRINT)
+                .put("ARCH", arch);
     }
     
     private JSONObject rootInfo() throws JSONException {
