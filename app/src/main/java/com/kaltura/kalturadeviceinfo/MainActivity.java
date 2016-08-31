@@ -13,7 +13,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -73,13 +72,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                String subject = "Kaltura Device Info - " + Build.BRAND + "/" + Build.MODEL + "/" + Build.VERSION.RELEASE + "/" + Build.VERSION.SDK_INT;
-                Intent shareIntent = intentWithAttachment(subject, report);
-                if (shareIntent == null) {
-                    Toast.makeText(MainActivity.this, "Can't share report as attachment", Toast.LENGTH_SHORT).show();
-                    shareIntent = intentWithText(subject, report);
-                }
-
+                String subject = "Kaltura Device Info - Report" + Build.BRAND + "/" + Build.MODEL + "/" + Build.VERSION.RELEASE + "/" + Build.VERSION.SDK_INT;
+                Intent shareIntent = intentWithText(subject, report);
                 startActivity(Intent.createChooser(shareIntent, getResources().getText(R.string.send_to)));
             }
         });
