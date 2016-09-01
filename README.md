@@ -1,5 +1,7 @@
 # Kaltura Device Info
 
+<img src="https://raw.githubusercontent.com/kaltura/kaltura-device-info-android/master/icon.png" width="32">
+
 A simple app that collects some diagnostic information about an Android device and allows sharing it using a standard share Intent.
 
 The data is collected into a JSONObject and displayed as JSON on screen. It is shares as JSON text. The app is used to diagnose Media and DRM issues.
