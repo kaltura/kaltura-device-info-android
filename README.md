@@ -1,6 +1,4 @@
-# Kaltura Device Info
-
-<img src="https://raw.githubusercontent.com/kaltura/kaltura-device-info-android/master/icon.png" width="32">
+# Kaltura Device Info ![icon]
 
 A simple app that collects some diagnostic information about an Android device and allows sharing it using a standard share Intent.
 
@@ -14,3 +12,4 @@ https://play.google.com/store/apps/details?id=com.kaltura.kalturadeviceinfo
 
  [![Build Status](https://travis-ci.org/kaltura/kaltura-device-info-android.svg?branch=master)](https://travis-ci.org/kaltura/kaltura-device-info-android)
  
+[icon]: https://raw.githubusercontent.com/kaltura/kaltura-device-info-android/master/app/src/main/res/mipmap-hdpi/ic_launcher.png
