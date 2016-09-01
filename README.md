@@ -12,4 +12,4 @@ https://play.google.com/store/apps/details?id=com.kaltura.kalturadeviceinfo
 
  [![Build Status](https://travis-ci.org/kaltura/kaltura-device-info-android.svg?branch=master)](https://travis-ci.org/kaltura/kaltura-device-info-android)
  
-[icon]: https://raw.githubusercontent.com/kaltura/kaltura-device-info-android/master/app/src/main/res/mipmap-hdpi/ic_launcher.png
+[icon]: icon48.png
