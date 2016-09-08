@@ -15,6 +15,12 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.safetynet.SafetyNet;
+import com.google.android.gms.safetynet.SafetyNetApi;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,7 +28,10 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
 
 /**
  * Created by noamt on 17/05/2016.
@@ -31,24 +40,60 @@ class Collector {
     private static final String TAG = "Collector";
     public static final UUID WIDEVINE_UUID = new UUID(0xEDEF8BA979D64ACEL, 0xA3C827DCD51D21EDL);
     private final Context mContext;
+    private final JSONObject mRoot = new JSONObject();
+    
+    private static String sReport;
 
+    static String getReport(Context ctx) {
+        if (sReport == null) {
+            Collector collector = new Collector(ctx);
+            JSONObject jsonReport = collector.collect();
+
+            try {
+                sReport = jsonReport.toString(4);
+            } catch (JSONException e) {
+                sReport = "{}";
+            }
+        }
+
+        return sReport;
+    }
+    
     Collector(Context context) {
         mContext = context;
     }
     
     JSONObject collect() {
-        JSONObject root = new JSONObject();
+        final JSONObject[] safetyNetResult = new JSONObject[1];
+        Thread safetyNetThread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    safetyNetResult[0]=collectSafetyNet();
+                } catch (JSONException e) {
+                    Log.e(TAG, "Failed converting safetyNet response to JSON");
+                }
+            }
+        };
+        safetyNetThread.start();
         try {
+            JSONObject root = mRoot;
             root.put("meta", meta());
-            root.put("build", buildInfo());
+            root.put("system", systemInfo());
             root.put("drm", drmInfo());
             root.put("display", displayInfo());
             root.put("media", mediaCodecInfo());
             root.put("root", rootInfo());
+            
+            safetyNetThread.join(20*1000);
+            root.put("safetyNet", safetyNetResult[0]);
+            
         } catch (JSONException e) {
             Log.e(TAG, "Error");
+        } catch (InterruptedException e) {
+            Log.d(TAG, "Interrupted");
         }
-        return root;
+        return mRoot;
     }
 
     private JSONObject meta() throws JSONException {
@@ -250,7 +295,7 @@ class Collector {
         return response;
     }
     
-    private JSONObject buildInfo() throws JSONException {
+    private JSONObject systemInfo() throws JSONException {
         JSONObject arch = new JSONObject().put("os.arch", System.getProperty("os.arch"));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             arch.put("SUPPORTED_ABIS", new JSONArray(Build.SUPPORTED_ABIS));
@@ -283,6 +328,48 @@ class Collector {
         info.put("existingFiles", files);
 
         return info;
+    }
+
+    // NOTE: this application is meant for user-initiated diagnostics. 
+    // It doesn't attempt to use the best security practices or to validate the result. 
+    private JSONObject collectSafetyNet() throws JSONException {
+        GoogleApiClient client = new GoogleApiClient.Builder(mContext)
+                .addApi(SafetyNet.API)
+                .build();
+        ConnectionResult connectionResult = client.blockingConnect(20, TimeUnit.SECONDS);
+        if (!connectionResult.isSuccess()) {
+            return new JSONObject().put("connectionError", connectionResult.toString());
+        }
+        byte[] nonce = getRequestNonce(); 
+        SafetyNetApi.AttestationResult result = SafetyNet.SafetyNetApi.attest(client, nonce).await(20, TimeUnit.SECONDS);
+                        Status status = result.getStatus();
+        if (!status.isSuccess()) {
+            return new JSONObject().put("testingError", status.toString());
+        }
+        String jwsResult = result.getJwsResult();
+        
+        // Extract the payload, ignore the rest.
+        String[] parts = jwsResult.split("\\.");
+        if (parts.length != 3) {
+            return new JSONObject().put("invalidResponse", jwsResult);
+        }
+        
+        String decoded = new String(Base64.decode(parts[1], Base64.URL_SAFE));
+        
+        JSONObject jsonObject = new JSONObject(decoded);
+
+        // Remove the boring keys
+        for (String key : new String[]{"nonce", "timestampMs", "apkPackageName", "apkCertificateDigestSha256", "apkDigestSha256"}) {
+            jsonObject.remove(key);
+        }
+
+        return jsonObject;
+    }
+
+    private byte[] getRequestNonce() {
+        byte[] bytes = new byte[32];
+        new Random().nextBytes(bytes);
+        return bytes;
     }
 }
 

@@ -14,9 +14,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -31,31 +28,20 @@ public class MainActivity extends AppCompatActivity {
         assert reportView != null;
         reportView.setText(report);
     }
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        
-        
+
+        // Collect data
         new AsyncTask<Void, Void, String>() {
 
             @Override
             protected String doInBackground(Void... params) {
-                final JSONObject info = new Collector(MainActivity.this).collect();
-
-                Log.d("JSON", info.toString());
-
-                String jsonString;
-                try {
-                    jsonString = info.toString(4);
-                } catch (JSONException e) {
-                    jsonString = "{}";
-                }
-                
-                return jsonString;
+                return Collector.getReport(MainActivity.this);
             }
 
             @Override
