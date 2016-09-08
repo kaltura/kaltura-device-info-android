@@ -8,6 +8,7 @@ android:
   - build-tools-24.0.2
   - android-24
   - extra-android-m2repository
+  - extra-google-m2repository
 cache:
   directories:
     - $HOME/.gradle/caches/
