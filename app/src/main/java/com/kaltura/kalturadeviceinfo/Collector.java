@@ -26,9 +26,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Random;
+import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -97,9 +101,14 @@ class Collector {
     }
 
     private JSONObject meta() throws JSONException {
+        TimeZone tz = TimeZone.getTimeZone("UTC");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        df.setTimeZone(tz);
+        String nowAsISO = df.format(new Date());
         return new JSONObject()
                 .put("versionName", BuildConfig.VERSION_NAME)
-                .put("versionCode", BuildConfig.VERSION_CODE);
+                .put("versionCode", BuildConfig.VERSION_CODE)
+                .put("timestamp", nowAsISO);
     }
 
     private JSONObject displayInfo() throws JSONException {
