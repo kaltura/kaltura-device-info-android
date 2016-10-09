@@ -42,7 +42,7 @@ import java.util.concurrent.TimeUnit;
  */
 class Collector {
     private static final String TAG = "Collector";
-    public static final UUID WIDEVINE_UUID = new UUID(0xEDEF8BA979D64ACEL, 0xA3C827DCD51D21EDL);
+    private static final UUID WIDEVINE_UUID = new UUID(0xEDEF8BA979D64ACEL, 0xA3C827DCD51D21EDL);
     private final Context mContext;
     private final JSONObject mRoot = new JSONObject();
     
@@ -55,6 +55,8 @@ class Collector {
 
             try {
                 sReport = jsonReport.toString(4);
+                sReport = sReport.replace("\\/", "/");
+                
             } catch (JSONException e) {
                 sReport = "{}";
             }
