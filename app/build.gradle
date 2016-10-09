@@ -8,8 +8,8 @@ android {
         applicationId "com.kaltura.kalturadeviceinfo"
         minSdkVersion 16
         targetSdkVersion 24
-        versionCode 12
-        versionName "1.0.12"
+        versionCode 13
+        versionName "1.1.0"
     }
     signingConfigs {
         
