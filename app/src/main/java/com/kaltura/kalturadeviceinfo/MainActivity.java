@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -48,6 +49,16 @@ public class MainActivity extends AppCompatActivity {
             protected void onPostExecute(String jsonString) {
                 report = jsonString;
                 showReport(jsonString);
+                File output = new File(getExternalFilesDir(null), "report.json");
+                try {
+                    FileWriter writer;
+                    writer = new FileWriter(output);
+                    writer.write(report);
+                    writer.close();
+                    Toast.makeText(MainActivity.this, "Wrote report to " + output, Toast.LENGTH_LONG).show();
+                } catch (Exception e) {
+                    Toast.makeText(MainActivity.this, "Failed writing report: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                }
             }
         }.execute();
 
