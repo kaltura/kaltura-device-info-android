@@ -13,7 +13,7 @@ before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 before_script:
   - mkdir -p $ANDROID_HOME/licenses
-  - echo $android-sdk-license > $ANDROID_HOME/licenses/android-sdk-license
+  - echo $android_sdk_license > $ANDROID_HOME/licenses/android-sdk-license
 script:
   - ./gradlew build
 after_success:
