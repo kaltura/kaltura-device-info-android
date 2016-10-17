@@ -5,10 +5,6 @@ android:
   components:
   - tools
   - platform-tools
-  - build-tools-24.0.3
-  - android-24
-  - extra-android-m2repository
-  - extra-google-m2repository
 cache:
   directories:
     - $HOME/.gradle/caches/
@@ -16,7 +12,8 @@ cache:
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 before_script:
-  - ls -la $ANDROID_HOME
+  - mkdir -p $ANDROID_HOME/licenses
+  - echo $android-sdk-license > $ANDROID_HOME/licenses/android-sdk-license
 script:
   - ./gradlew build
 after_success:
