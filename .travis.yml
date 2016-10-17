@@ -12,6 +12,8 @@ before_script:
   - echo $android_sdk_license > $ANDROID_HOME/licenses/android-sdk-license
 script:
   - ./gradlew build
+after_failure:
+  - cat app/build/outputs/lint-results-debug.xml
 after_success:
   - ls -l app/build/outputs/apk
   - mv app/build/outputs/apk/app-release.apk kaltura-device-info-release.apk
