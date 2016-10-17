@@ -1,9 +1,6 @@
 language: android
 jdk:
-- oraclejdk8
-android:
-  components:
-  - platform-tools
+  - oraclejdk8
 cache:
   directories:
     - $HOME/.gradle/caches/
