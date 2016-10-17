@@ -4,7 +4,6 @@ jdk:
 android:
   components:
   - tools
-  - platform-tools
 cache:
   directories:
     - $HOME/.gradle/caches/
