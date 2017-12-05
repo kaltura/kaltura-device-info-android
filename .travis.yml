@@ -5,6 +5,8 @@ android:
   components:
   - tools
   - platform-tools
+  - android-26
+  - build-tools-26
 cache:
   directories:
     - $HOME/.gradle/caches/
