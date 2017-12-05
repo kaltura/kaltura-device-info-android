@@ -22,7 +22,7 @@ after_failure:
   - cat app/build/outputs/lint-results-debug.xml
 after_success:
   - ls -l app/build/outputs/apk
-  - mv app/build/outputs/apk/app-release.apk kaltura-device-info-release.apk
+  - mv app/build/outputs/apk/release/app-release.apk kaltura-device-info-release.apk
 deploy:
   provider: releases
   draft: false
