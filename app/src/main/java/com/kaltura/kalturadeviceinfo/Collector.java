@@ -42,15 +42,17 @@ import java.util.concurrent.TimeUnit;
  */
 class Collector {
     private static final String TAG = "Collector";
-    private static final UUID WIDEVINE_UUID = new UUID(0xEDEF8BA979D64ACEL, 0xA3C827DCD51D21EDL);
+    static final UUID WIDEVINE_UUID = new UUID(0xEDEF8BA979D64ACEL, 0xA3C827DCD51D21EDL);
     private final Context mContext;
+    private final boolean includeSafetyNet;
     private final JSONObject mRoot = new JSONObject();
     
     private static String sReport;
 
-    static String getReport(Context ctx) {
+    static String getReport(Context ctx, boolean includeSafetyNet) {
+        sReport = null;
         if (sReport == null) {
-            Collector collector = new Collector(ctx);
+            Collector collector = new Collector(ctx, includeSafetyNet);
             JSONObject jsonReport = collector.collect();
 
             try {
@@ -65,8 +67,9 @@ class Collector {
         return sReport;
     }
     
-    Collector(Context context) {
+    Collector(Context context, boolean includeSafetyNet) {
         mContext = context;
+        this.includeSafetyNet = includeSafetyNet;
     }
     
     JSONObject collect() {
@@ -81,7 +84,10 @@ class Collector {
                 }
             }
         };
-        safetyNetThread.start();
+        
+        if (includeSafetyNet) {
+            safetyNetThread.start();
+        }
         try {
             JSONObject root = mRoot;
             root.put("meta", meta());
@@ -91,8 +97,10 @@ class Collector {
             root.put("media", mediaCodecInfo());
             root.put("root", rootInfo());
             
-            safetyNetThread.join(20*1000);
-            root.put("safetyNet", safetyNetResult[0]);
+            if (includeSafetyNet) {
+                safetyNetThread.join(20 * 1000);
+                root.put("safetyNet", safetyNetResult[0]);
+            }
             
         } catch (JSONException e) {
             Log.e(TAG, "Error");
@@ -256,23 +264,6 @@ class Collector {
         }
 
 
-        JSONObject provision = new JSONObject();
-        try {
-            MediaDrm.ProvisionRequest provisionRequest = mediaDrm.getProvisionRequest();
-            byte[] data = provisionRequest.getData();
-            String encodedData = Base64.encodeToString(data, Base64.NO_WRAP);
-
-            provision
-                    .put("url", provisionRequest.getDefaultUrl())
-                    .put("data", encodedData);
-        } catch (RuntimeException e) {
-            String message = e.toString();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && e instanceof MediaDrm.MediaDrmStateException) {
-                message += "; " + ((MediaDrm.MediaDrmStateException) e).getDiagnosticInfo();
-            }
-            provision.put("Exception(getProvisionRequest)", message);
-        }
-
         String[] stringProps = {MediaDrm.PROPERTY_VENDOR, MediaDrm.PROPERTY_VERSION, MediaDrm.PROPERTY_DESCRIPTION, MediaDrm.PROPERTY_ALGORITHMS, "securityLevel", "systemId", "privacyMode", "sessionSharing", "usageReportingSupport", "appId", "origin", "hdcpLevel", "maxHdcpLevel", "maxNumberOfSessions", "numberOfOpenSessions"};
         String[] byteArrayProps = {MediaDrm.PROPERTY_DEVICE_UNIQUE_ID, "provisioningUniqueId", "serviceCertificate"};
         
@@ -300,8 +291,6 @@ class Collector {
         JSONObject response = new JSONObject();
         response.put("properties", props);
         response.put("events", mediaDrmEvents);
-        response.put("provisionRequest", provision);
-
 
         return response;
     }
