@@ -1,5 +1,6 @@
 package com.kaltura.kalturadeviceinfo;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.drm.DrmInfo;
@@ -26,6 +27,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -294,7 +296,21 @@ class Collector {
 
         return response;
     }
-    
+
+    private static String chipset() {
+        try {
+            @SuppressLint("PrivateApi")
+            Class<?> aClass = Class.forName("android.os.SystemProperties");
+            Method method = aClass.getMethod("get", String.class);
+            Object platform = method.invoke(null, "ro.board.platform");
+
+            return platform instanceof String ? (String) platform : "<" + platform + ">";
+
+        } catch (Exception e) {
+            return "<" + e + ">";
+        }
+    }
+
     private JSONObject systemInfo() throws JSONException {
         JSONObject arch = new JSONObject().put("os.arch", System.getProperty("os.arch"));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -310,6 +326,7 @@ class Collector {
                 .put("MANUFACTURER", Build.MANUFACTURER)
                 .put("TAGS", Build.TAGS)
                 .put("FINGERPRINT", Build.FINGERPRINT)
+                .put("BOARD", chipset())
                 .put("ARCH", arch);
     }
     
