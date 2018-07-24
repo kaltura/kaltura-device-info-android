@@ -4,18 +4,8 @@ jdk:
 android:
   components:
   - tools
-  - platform-tools
-  - android-26
-  - build-tools-26
-cache:
-  directories:
-    - $HOME/.gradle/caches/
-    - $HOME/.gradle/wrapper/
-before_cache:
-  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 before_script:
-  - mkdir -p $ANDROID_HOME/licenses
-  - echo $android_sdk_license > $ANDROID_HOME/licenses/android-sdk-license
+  - curl https://kaltura.github.io/fe-tools/android/license.sh | sh
 script:
   - ./gradlew build
 after_failure:
