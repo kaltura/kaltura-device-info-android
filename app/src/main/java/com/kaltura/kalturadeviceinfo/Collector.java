@@ -324,9 +324,10 @@ class Collector {
                 .put("BRAND", Build.BRAND)
                 .put("MODEL", Build.MODEL)
                 .put("MANUFACTURER", Build.MANUFACTURER)
+                .put("DEVICE", Build.DEVICE)
+                .put("BOARD", chipset())
                 .put("TAGS", Build.TAGS)
                 .put("FINGERPRINT", Build.FINGERPRINT)
-                .put("BOARD", chipset())
                 .put("ARCH", arch);
     }
     
