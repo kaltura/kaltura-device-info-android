@@ -33,5 +33,5 @@ android {
 dependencies {
     compile 'com.android.support:appcompat-v7:26.1.0'
     compile 'com.android.support:design:26.1.0'
-    compile 'com.google.android.gms:play-services-safetynet:11.6.2'
+//    compile 'com.google.android.gms:play-services-safetynet:11.6.2'
 }

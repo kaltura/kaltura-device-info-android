@@ -15,11 +15,11 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.safetynet.SafetyNet;
-import com.google.android.gms.safetynet.SafetyNetApi;
+//import com.google.android.gms.common.ConnectionResult;
+//import com.google.android.gms.common.api.GoogleApiClient;
+//import com.google.android.gms.common.api.Status;
+//import com.google.android.gms.safetynet.SafetyNet;
+//import com.google.android.gms.safetynet.SafetyNetApi;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -74,20 +74,20 @@ class Collector {
     
     JSONObject collect() {
         final JSONObject[] safetyNetResult = new JSONObject[1];
-        Thread safetyNetThread = new Thread() {
-            @Override
-            public void run() {
-                try {
-                    safetyNetResult[0]=collectSafetyNet();
-                } catch (JSONException e) {
-                    Log.e(TAG, "Failed converting safetyNet response to JSON");
-                }
-            }
-        };
-        
-        if (includeSafetyNet) {
-            safetyNetThread.start();
-        }
+//        Thread safetyNetThread = new Thread() {
+//            @Override
+//            public void run() {
+//                try {
+//                    safetyNetResult[0]=collectSafetyNet();
+//                } catch (JSONException e) {
+//                    Log.e(TAG, "Failed converting safetyNet response to JSON");
+//                }
+//            }
+//        };
+//
+//        if (includeSafetyNet) {
+//            safetyNetThread.start();
+//        }
         try {
             JSONObject root = mRoot;
             root.put("meta", meta());
@@ -97,15 +97,15 @@ class Collector {
             root.put("media", mediaCodecInfo());
             root.put("root", rootInfo());
             
-            if (includeSafetyNet) {
-                safetyNetThread.join(20 * 1000);
-                root.put("safetyNet", safetyNetResult[0]);
-            }
+//            if (includeSafetyNet) {
+//                safetyNetThread.join(20 * 1000);
+//                root.put("safetyNet", safetyNetResult[0]);
+//            }
             
         } catch (JSONException e) {
             Log.e(TAG, "Error");
-        } catch (InterruptedException e) {
-            Log.d(TAG, "Interrupted");
+//        } catch (InterruptedException e) {
+//            Log.d(TAG, "Interrupted");
         }
         return mRoot;
     }
@@ -332,39 +332,39 @@ class Collector {
 
     // NOTE: this application is meant for user-initiated diagnostics. 
     // It doesn't attempt to use the best security practices or to validate the result. 
-    private JSONObject collectSafetyNet() throws JSONException {
-        GoogleApiClient client = new GoogleApiClient.Builder(mContext)
-                .addApi(SafetyNet.API)
-                .build();
-        ConnectionResult connectionResult = client.blockingConnect(20, TimeUnit.SECONDS);
-        if (!connectionResult.isSuccess()) {
-            return new JSONObject().put("connectionError", connectionResult.toString());
-        }
-        byte[] nonce = getRequestNonce(); 
-        SafetyNetApi.AttestationResult result = SafetyNet.SafetyNetApi.attest(client, nonce).await(20, TimeUnit.SECONDS);
-                        Status status = result.getStatus();
-        if (!status.isSuccess()) {
-            return new JSONObject().put("testingError", status.toString());
-        }
-        String jwsResult = result.getJwsResult();
-        
-        // Extract the payload, ignore the rest.
-        String[] parts = jwsResult.split("\\.");
-        if (parts.length != 3) {
-            return new JSONObject().put("invalidResponse", jwsResult);
-        }
-        
-        String decoded = new String(Base64.decode(parts[1], Base64.URL_SAFE));
-        
-        JSONObject jsonObject = new JSONObject(decoded);
-
-        // Remove the boring keys
-        for (String key : new String[]{"nonce", "timestampMs", "apkPackageName", "apkCertificateDigestSha256", "apkDigestSha256"}) {
-            jsonObject.remove(key);
-        }
-
-        return jsonObject;
-    }
+//    private JSONObject collectSafetyNet() throws JSONException {
+//        GoogleApiClient client = new GoogleApiClient.Builder(mContext)
+//                .addApi(SafetyNet.API)
+//                .build();
+//        ConnectionResult connectionResult = client.blockingConnect(20, TimeUnit.SECONDS);
+//        if (!connectionResult.isSuccess()) {
+//            return new JSONObject().put("connectionError", connectionResult.toString());
+//        }
+//        byte[] nonce = getRequestNonce();
+//        SafetyNetApi.AttestationResult result = SafetyNet.SafetyNetApi.attest(client, nonce).await(20, TimeUnit.SECONDS);
+//                        Status status = result.getStatus();
+//        if (!status.isSuccess()) {
+//            return new JSONObject().put("testingError", status.toString());
+//        }
+//        String jwsResult = result.getJwsResult();
+//
+//        // Extract the payload, ignore the rest.
+//        String[] parts = jwsResult.split("\\.");
+//        if (parts.length != 3) {
+//            return new JSONObject().put("invalidResponse", jwsResult);
+//        }
+//
+//        String decoded = new String(Base64.decode(parts[1], Base64.URL_SAFE));
+//
+//        JSONObject jsonObject = new JSONObject(decoded);
+//
+//        // Remove the boring keys
+//        for (String key : new String[]{"nonce", "timestampMs", "apkPackageName", "apkCertificateDigestSha256", "apkDigestSha256"}) {
+//            jsonObject.remove(key);
+//        }
+//
+//        return jsonObject;
+//    }
 
     private byte[] getRequestNonce() {
         byte[] bytes = new byte[32];

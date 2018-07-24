@@ -31,7 +31,7 @@ import java.net.URL;
 
 
 public class MainActivity extends AppCompatActivity {
-    
+
     String report;
 
     private void showReport(String report) {
@@ -63,7 +63,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showActionsDialog() {
-        String[] actions = {"Share...", "Refresh", "Refresh with SafetyNet", "Provision Widevine"};
+        String[] actions = {
+                "Share...",
+                "Refresh",
+//                "Refresh with SafetyNet",
+                "Provision Widevine"
+        };
         new AlertDialog.Builder(this).setTitle("Select action").setItems(actions, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -75,9 +80,9 @@ public class MainActivity extends AppCompatActivity {
                         new CollectorTask().execute(false);
                         break;
                     case 2:
-                        new CollectorTask().execute(true);
-                        break;
-                    case 3:
+//                        new CollectorTask().execute(true);
+//                        break;
+//                    case 3:
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
                             new AlertDialog.Builder(MainActivity.this).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
