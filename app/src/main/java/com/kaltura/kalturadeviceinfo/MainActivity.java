@@ -1,5 +1,6 @@
 package com.kaltura.kalturadeviceinfo;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -63,39 +64,46 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showActionsDialog() {
-        String[] actions = {
-                "Share...",
-                "Refresh",
-//                "Refresh with SafetyNet",
-                "Provision Widevine"
-        };
-        new AlertDialog.Builder(this).setTitle("Select action").setItems(actions, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case 0:
-                        shareReport();
-                        break;
-                    case 1:
-                        new CollectorTask().execute(false);
-                        break;
-                    case 2:
-//                        new CollectorTask().execute(true);
-//                        break;
-//                    case 3:
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                            new AlertDialog.Builder(MainActivity.this).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    startProvision();
-                                }
-                            }).setNegativeButton("No", null).setMessage("Are you sure you want to attempt Widevine Provisioning?").show();
-                        }
-                        break;
-                }
+
+        String[] actions;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            actions = new String[]{"Share...", "Refresh", "Test DRM Playback", "Provision Widevine"};
+        } else {
+            actions = new String[]{"Share...", "Refresh"};
+        }
+
+        new AlertDialog.Builder(this).setTitle("Select action").setItems(actions, (dialog, which) -> {
+            switch (which) {
+                case 0: // Share
+                    shareReport();
+                    break;
+                case 1: // Refresh
+                    new CollectorTask().execute(false);
+                    break;
+                case 2: // Play
+                    testPlayback();
+                    break;
+                case 3: // Provision
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                        new AlertDialog.Builder(MainActivity.this)
+                                .setPositiveButton("Yes", (dialog1, which1) -> startProvision())
+                                .setNegativeButton("No", null)
+                                .setMessage("Are you sure you want to attempt Widevine Provisioning?")
+                                .show();
+                    }
+                    break;
             }
         }).show();
+    }
+
+    private void testPlayback() {
+        final String[] items = {"Kaltura", "Google"};
+        new AlertDialog.Builder(this)
+                .setTitle("Select Asset")
+                .setItems(items, (dialog, which) -> {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(items[which]), this, PlayerActivity.class));
+                })
+                .show();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
