@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
 
     defaultConfig {
         applicationId "com.kaltura.kalturadeviceinfo"
@@ -37,12 +37,12 @@ android {
 }
 
 dependencies {
-    implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.android.support:design:27.1.1'
+    implementation 'androidx.appcompat:appcompat:1.1.0-alpha01'
+    implementation 'com.google.android.material:material:1.1.0-alpha02'
     implementation 'com.google.android.exoplayer:exoplayer-core:2.9.3'
     implementation 'com.google.android.exoplayer:exoplayer-dash:2.9.3'
     implementation 'com.google.android.exoplayer:exoplayer-hls:2.9.3'
     implementation 'com.google.android.exoplayer:exoplayer-ui:2.9.3'
 //    compile 'com.google.android.gms:play-services-safetynet:11.6.2'
-    implementation 'com.android.support:support-v4:27.1.1'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 }

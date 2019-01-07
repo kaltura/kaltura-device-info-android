@@ -1,8 +1,6 @@
 package com.kaltura.kalturadeviceinfo;
 
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.MediaDrm;
@@ -10,12 +8,12 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.content.FileProvider;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.RequiresApi;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.core.content.FileProvider;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -36,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
     String report;
 
     private void showReport(String report) {
-        TextView reportView = (TextView) findViewById(R.id.textView);
+        TextView reportView = findViewById(R.id.textView);
         assert reportView != null;
         reportView.setText(report);
     }
@@ -45,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         // Collect data
@@ -53,13 +51,7 @@ public class MainActivity extends AppCompatActivity {
 
         FloatingActionButton fab = findViewById(R.id.fab);
         assert fab != null;
-        fab.setOnClickListener(new View.OnClickListener() {
-            
-            @Override
-            public void onClick(View view) {
-                showActionsDialog();
-            }
-        });
+        fab.setOnClickListener(view -> showActionsDialog());
 
     }
 
@@ -109,12 +101,6 @@ public class MainActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     private void startProvision() {
         new ProvisionTask(this).execute();
-    }
-
-    private void provisionFailed(Exception e) {
-    }
-
-    private void provisionSuccessful() {
     }
 
     private void shareReport() {
