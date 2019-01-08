@@ -10,6 +10,9 @@ import android.os.SystemClock;
 import androidx.core.app.NavUtils;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import okhttp3.OkHttpClient;
+import okhttp3.Protocol;
+
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,6 +27,7 @@ import com.google.android.exoplayer2.drm.DefaultDrmSessionManager;
 import com.google.android.exoplayer2.drm.FrameworkMediaCrypto;
 import com.google.android.exoplayer2.drm.HttpMediaDrmCallback;
 import com.google.android.exoplayer2.drm.UnsupportedDrmException;
+import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSourceFactory;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
 import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
@@ -36,6 +40,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
 
@@ -185,8 +191,8 @@ public class PlayerActivity extends AppCompatActivity {
                 licenseUrl = "https://udrm.kaltura.com/cenc/widevine/license?custom_data=eyJjYV9zeXN0ZW0iOiJPVlAiLCJ1c2VyX3Rva2VuIjoiZGpKOE1qSXlNalF3TVh5bkdiU2JIQ2FOaUQxYzBYRDlfUlBvWmFxaFprTkhTUVRCZ3VHVUVNYUtFNTZKS3Q4YjM5aGZtZTU4R1N3bHBoM05Ra0pTYWVxYmJNZ2Zud3F0d3hlUkM2MW0xenFBRmFhN3h0c1NGd01YX1dJME9LMkoyQ0NZX0VOVlNkbUpiLW89IiwiYWNjb3VudF9pZCI6IjIyMjI0MDEiLCJjb250ZW50X2lkIjoiMV9rdnYzajF6ayIsImZpbGVzIjoiMV84M3dpZ3ZiYSwxX2toemh3YWs2In0%3D&signature=BoWR1xlAxXzDuP7oQM5GtDcQrpk%3D";
                 break;
             case "Google":
-                contentUrl = "https://storage.googleapis.com/wvmedia/cenc/h264/tears/tears.mpd";
-                licenseUrl = "https://proxy.uat.widevine.com/proxy?video_id=48fcc369939ac96c&provider=widevine_test";
+                contentUrl = "https://storage.googleapis.com/shaka-demo-assets/angel-one-widevine/dash.mpd";
+                licenseUrl = "https://cwip-shaka-proxy.appspot.com/no_auth";
                 break;
             default:
                 return;
