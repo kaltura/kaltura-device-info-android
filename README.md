@@ -14,4 +14,3 @@ https://play.google.com/store/apps/details?id=com.kaltura.kalturadeviceinfo
  
 [icon]: icon48.png
 
-
