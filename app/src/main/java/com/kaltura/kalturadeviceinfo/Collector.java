@@ -177,9 +177,17 @@ class Collector {
     }
 
     private JSONObject mediaCodecInfo(MediaCodecInfo mediaCodec) throws JSONException {
-        return new JSONObject()
-//                .put("isEncoder", mediaCodec.isEncoder())
-                .put("supportedTypes", jsonArray(mediaCodec.getSupportedTypes()));
+        private JSONObject mediaCodecInfo(MediaCodecInfo mediaCodec) throws JSONException {
+
+            JSONObject codecInfo =  new JSONObject();
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                codecInfo.put("isVendor", mediaCodec.isVendor());
+                codecInfo.put("isSoftwareOnly", mediaCodec.isSoftwareOnly());
+                codecInfo.put("isHardwareAccelerated", mediaCodec.isHardwareAccelerated());
+            }
+            codecInfo.put("supportedTypes", jsonArray(mediaCodec.getSupportedTypes()));
+            return codecInfo;
+        }
     }
     
     private JSONObject mediaCodecInfo() throws JSONException {
