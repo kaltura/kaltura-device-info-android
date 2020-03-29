@@ -24,6 +24,7 @@ import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.drm.DefaultDrmSessionEventListener;
 import com.google.android.exoplayer2.drm.DefaultDrmSessionManager;
+import com.google.android.exoplayer2.drm.ExoMediaCrypto;
 import com.google.android.exoplayer2.drm.FrameworkMediaCrypto;
 import com.google.android.exoplayer2.drm.HttpMediaDrmCallback;
 import com.google.android.exoplayer2.drm.UnsupportedDrmException;
@@ -212,8 +213,8 @@ public class PlayerActivity extends AppCompatActivity {
 
         HttpDataSource.Factory httpDataSourceFactory = new DefaultHttpDataSourceFactory(userAgent);
 
-        final DefaultDrmSessionManager<FrameworkMediaCrypto> drmSessionManager =
-                DefaultDrmSessionManager.newWidevineInstance(new HttpMediaDrmCallback(licenseUrl, httpDataSourceFactory), null);
+        final DefaultDrmSessionManager<ExoMediaCrypto> drmSessionManager =
+                new DefaultDrmSessionManager.Builder().build(new HttpMediaDrmCallback(licenseUrl, httpDataSourceFactory));
 
         drmSessionManager.addListener(new Handler(Looper.getMainLooper()), new DefaultDrmSessionEventListener() {
             @Override
@@ -247,7 +248,9 @@ public class PlayerActivity extends AppCompatActivity {
             }
         });
 
-        player = ExoPlayerFactory.newSimpleInstance(this, new DefaultRenderersFactory(this), new DefaultTrackSelector(), drmSessionManager);
+
+        player = new SimpleExoPlayer.Builder(this, new DefaultRenderersFactory(this))
+                .setTrackSelector(new DefaultTrackSelector(this)).build();
         mContentView.setPlayer(player);
 
 
@@ -294,7 +297,7 @@ public class PlayerActivity extends AppCompatActivity {
         // Produces DataSource instances through which media data is loaded.
 
         Uri uri = Uri.parse(contentUrl);
-        final DashMediaSource mediaSource = new DashMediaSource.Factory(new DefaultDashChunkSource.Factory(httpDataSourceFactory), httpDataSourceFactory).createMediaSource(uri);
+        final DashMediaSource mediaSource = new DashMediaSource.Factory(new DefaultDashChunkSource.Factory(httpDataSourceFactory), httpDataSourceFactory).setDrmSessionManager(drmSessionManager).createMediaSource(uri);
 
         player.prepare(mediaSource);
         player.setPlayWhenReady(true);

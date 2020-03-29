@@ -47,7 +47,7 @@ class Collector {
     private final Context mContext;
     private final boolean includeSafetyNet;
     private final JSONObject mRoot = new JSONObject();
-    
+
     private static String sReport;
 
     static String getReport(Context ctx, boolean includeSafetyNet) {
@@ -59,7 +59,7 @@ class Collector {
             try {
                 sReport = jsonReport.toString(4);
                 sReport = sReport.replace("\\/", "/");
-                
+
             } catch (JSONException e) {
                 sReport = "{}";
             }
@@ -67,12 +67,12 @@ class Collector {
 
         return sReport;
     }
-    
+
     Collector(Context context, boolean includeSafetyNet) {
         mContext = context;
         this.includeSafetyNet = includeSafetyNet;
     }
-    
+
     JSONObject collect() {
         final JSONObject[] safetyNetResult = new JSONObject[1];
 //        Thread safetyNetThread = new Thread() {
@@ -97,12 +97,12 @@ class Collector {
             root.put("display", displayInfo());
             root.put("media", mediaCodecInfo());
             root.put("root", rootInfo());
-            
+
 //            if (includeSafetyNet) {
 //                safetyNetThread.join(20 * 1000);
 //                root.put("safetyNet", safetyNetResult[0]);
 //            }
-            
+
         } catch (JSONException e) {
             Log.e(TAG, "Error");
 //        } catch (InterruptedException e) {
@@ -130,27 +130,27 @@ class Collector {
         return new JSONObject()
                 .put("modular", modularDrmInfo())
                 .put("classic", classicDrmInfo());
-                
+
     }
 
     private JSONObject classicDrmInfo() throws JSONException {
         JSONObject json = new JSONObject();
-        
+
         DrmManagerClient drmManagerClient = new DrmManagerClient(mContext);
         String[] availableDrmEngines = drmManagerClient.getAvailableDrmEngines();
 
         JSONArray engines = jsonArray(availableDrmEngines);
         json.put("engines", engines);
-        
+
         try {
             if (drmManagerClient.canHandle("", "video/wvm")) {
                 DrmInfoRequest request = new DrmInfoRequest(DrmInfoRequest.TYPE_REGISTRATION_INFO, "video/wvm");
                 request.put("WVPortalKey", "OEM");
                 DrmInfo response = drmManagerClient.acquireDrmInfo(request);
                 String status = (String) response.get("WVDrmInfoRequestStatusKey");
-                
+
                 status = new String[]{"HD_SD", null, "SD"}[Integer.parseInt(status)];
-                json.put("widevine", 
+                json.put("widevine",
                         new JSONObject()
                                 .put("version", response.get("WVDrmInfoRequestVersionKey"))
                                 .put("status", status)
@@ -161,7 +161,7 @@ class Collector {
         }
 
         drmManagerClient.release();
-        
+
         return json;
     }
 
@@ -177,11 +177,18 @@ class Collector {
     }
 
     private JSONObject mediaCodecInfo(MediaCodecInfo mediaCodec) throws JSONException {
-        return new JSONObject()
-//                .put("isEncoder", mediaCodec.isEncoder())
-                .put("supportedTypes", jsonArray(mediaCodec.getSupportedTypes()));
+
+        JSONObject codecInfo =  new JSONObject();
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            codecInfo.put("isVendor", mediaCodec.isVendor());
+            codecInfo.put("isSoftwareOnly", mediaCodec.isSoftwareOnly());
+            codecInfo.put("isHardwareAccelerated", mediaCodec.isHardwareAccelerated());
+        }
+        codecInfo.put("supportedTypes", jsonArray(mediaCodec.getSupportedTypes()));
+        return codecInfo;
     }
-    
+
+
     private JSONObject mediaCodecInfo() throws JSONException {
 
         ArrayList<MediaCodecInfo> mediaCodecs = new ArrayList<>();
@@ -189,19 +196,19 @@ class Collector {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             MediaCodecList mediaCodecList = new MediaCodecList(MediaCodecList.ALL_CODECS);
             MediaCodecInfo[] codecInfos = mediaCodecList.getCodecInfos();
-            
+
             Collections.addAll(mediaCodecs, codecInfos);
         } else {
             for (int i=0, n=MediaCodecList.getCodecCount(); i<n; i++) {
                 mediaCodecs.add(MediaCodecList.getCodecInfoAt(i));
             }
         }
-        
+
         ArrayList<MediaCodecInfo> encoders = new ArrayList<>();
         ArrayList<MediaCodecInfo> decoders = new ArrayList<>();
         for (MediaCodecInfo mediaCodec : mediaCodecs) {
             if (mediaCodec.isEncoder()) {
-                encoders.add(mediaCodec); 
+                encoders.add(mediaCodec);
             } else {
                 decoders.add(mediaCodec);
             }
@@ -213,9 +220,9 @@ class Collector {
             jsonDecoders.put(mediaCodec.getName(), mediaCodecInfo(mediaCodec));
         }
         info.put("decoders", jsonDecoders);
-        
+
         return info;
-        
+
     }
 
     private JSONObject modularDrmInfo() throws JSONException {
@@ -240,9 +247,9 @@ class Collector {
         } catch (UnsupportedSchemeException e) {
             return null;
         }
-        
+
         final JSONArray mediaDrmEvents = new JSONArray();
-        
+
         mediaDrm.setOnEventListener((md, sessionId, event, extra, data) -> {
             try {
                 String encodedData = data == null ? null : Base64.encodeToString(data, Base64.NO_WRAP);
@@ -264,9 +271,9 @@ class Collector {
 
         String[] stringProps = {MediaDrm.PROPERTY_VENDOR, MediaDrm.PROPERTY_VERSION, MediaDrm.PROPERTY_DESCRIPTION, MediaDrm.PROPERTY_ALGORITHMS, "securityLevel", "systemId", "privacyMode", "sessionSharing", "usageReportingSupport", "appId", "origin", "hdcpLevel", "maxHdcpLevel", "maxNumberOfSessions", "numberOfOpenSessions"};
         String[] byteArrayProps = {MediaDrm.PROPERTY_DEVICE_UNIQUE_ID, "provisioningUniqueId", "serviceCertificate"};
-        
+
         JSONObject props = new JSONObject();
-        
+
         for (String prop : stringProps) {
             String value;
             try {
@@ -326,7 +333,7 @@ class Collector {
                 .put("FINGERPRINT", Build.FINGERPRINT)
                 .put("ARCH", arch);
     }
-    
+
     private JSONObject rootInfo() throws JSONException {
 
         JSONObject info = new JSONObject();
