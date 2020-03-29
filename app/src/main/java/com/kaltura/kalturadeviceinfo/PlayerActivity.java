@@ -251,7 +251,6 @@ public class PlayerActivity extends AppCompatActivity {
 
         player = new SimpleExoPlayer.Builder(this, new DefaultRenderersFactory(this))
                 .setTrackSelector(new DefaultTrackSelector(this)).build();
-        //player = new SimpleExoPlayer().   ExoPlayerFactory.newSimpleInstance(this, , new DefaultTrackSelector(), drmSessionManager);
         mContentView.setPlayer(player);
 
 
